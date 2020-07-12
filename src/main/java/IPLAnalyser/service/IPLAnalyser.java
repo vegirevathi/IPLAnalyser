@@ -11,15 +11,15 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.StreamSupport;
 
 public class IPLAnalyser {
     public int loadIPLMostRunsData(String csvFilePath) {
         try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.createCSVBuilder();
-            Iterator<MostRunCSV> battingDataIterator = csvBuilder.getCSVFileIterator(reader, MostRunCSV.class);
-            Iterable<MostRunCSV> battingDataIterable = () -> battingDataIterator;
-            return (int) StreamSupport.stream(battingDataIterable.spliterator(), false).count();
+            List<MostRunCSV> iplCSVList = csvBuilder.getCSVFileList(reader, MostRunCSV.class);
+            return iplCSVList.size();
         } catch (IOException e) {
             e.printStackTrace();
             return 0;
@@ -32,9 +32,8 @@ public class IPLAnalyser {
     public int loadIPLMostWktsData(String csvFilePath) {
         try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.createCSVBuilder();
-            Iterator<MostWktsCSV> bowlingDataIterator = csvBuilder.getCSVFileIterator(reader, MostWktsCSV.class);
-            Iterable<MostWktsCSV> bowlingDataIterable = () -> bowlingDataIterator;
-            return (int) StreamSupport.stream(bowlingDataIterable.spliterator(), false).count();
+            List<MostWktsCSV> iplCSVList = csvBuilder.getCSVFileList(reader, MostWktsCSV.class);
+            return iplCSVList.size();
         } catch (IOException e) {
             e.printStackTrace();
             return 0;
