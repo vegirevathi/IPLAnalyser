@@ -22,38 +22,42 @@ public class IPLAnalyser {
     List<MostRunCSV> iplCSVList;
     List<MostWktsCSV> iplWktsCsvList;
 
-    public int loadIPLMostRunsData(String csvFilePath) {
+    public int loadIPLMostRunsData(String csvFilePath) throws IPLAnalyserException {
         try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.createCSVBuilder();
             iplCSVList = csvBuilder.getCSVFileList(reader, MostRunCSV.class);
             return iplCSVList.size();
         } catch (IOException e) {
-            e.printStackTrace();
-            return 0;
+            throw new IPLAnalyserException(e.getMessage(),
+                    IPLAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
+        } catch (RuntimeException e) {
+            throw new IPLAnalyserException(e.getMessage(),
+                    IPLAnalyserException.ExceptionType.DELIMITER_HEADER_PROBLEM);
         } catch (CSVBuilderException e) {
-            e.printStackTrace();
-            return 0;
+            throw new IPLAnalyserException(e.getMessage(), e.type.name());
         }
     }
 
-    public int loadIPLMostWktsData(String csvFilePath) {
+    public int loadIPLMostWktsData(String csvFilePath) throws IPLAnalyserException {
         try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.createCSVBuilder();
             iplWktsCsvList = csvBuilder.getCSVFileList(reader, MostWktsCSV.class);
-            return iplCSVList.size();
+            return iplWktsCsvList.size();
         } catch (IOException e) {
-            e.printStackTrace();
-            return 0;
+            throw new IPLAnalyserException(e.getMessage(),
+                    IPLAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
+        } catch (RuntimeException e) {
+            throw new IPLAnalyserException(e.getMessage(),
+                    IPLAnalyserException.ExceptionType.DELIMITER_HEADER_PROBLEM);
         } catch (CSVBuilderException e) {
-            e.printStackTrace();
-            return 0;
+            throw new IPLAnalyserException(e.getMessage(), e.type.name());
         }
     }
 
     public String getAvgWiseSortedIPLPLayersRecords(String csvFilePath) throws IPLAnalyserException {
         loadIPLMostRunsData(csvFilePath);
         if (iplCSVList == null || iplCSVList.size() == 0) {
-            throw new IPLAnalyserException(IPLAnalyserException.ExceptionType.NO_IPL_DATA, "NO_IPL_DATA");
+            throw new IPLAnalyserException("NO_IPL_DATA", IPLAnalyserException.ExceptionType.NO_IPL_DATA);
         }
 
         Comparator<MostRunCSV> iplComparator = Comparator.comparing(iplRecord -> iplRecord.avg);
